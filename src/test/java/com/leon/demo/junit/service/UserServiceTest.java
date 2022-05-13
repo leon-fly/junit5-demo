@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -54,7 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void giveStudentUserIdThenReturnUserWithStudentExtendInfo() {
+    public void testFindUserById_when_userIsStudent_then_returnUserWithStudentExtendInfo() {
         // you can set up a specific mock for all test method.
         Mockito.when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(Type.STUDENT, "Student"));
         User student = userService.findUserById("Student");
@@ -63,7 +62,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void giveTeacherUserIdThenReturnUserWithTeacherExtendInfo() {
+    public void testFindUserById_when_userIsTeacher_then_returnUserWithTeacherExtendInfo() {
         Mockito.when(userDao.findUserById("Teacher")).thenReturn(buildUserBaseInfo(Type.TEACHER, "Teacher"));
         User teacher = userService.findUserById("Teacher");
         Assert.assertNotNull(teacher.getTeacherExtraInfo());
@@ -71,7 +70,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void giveInvalidDataThenThrowException() {
+    public void testFindUserById_when_userIsInvalidData_then_throwException() {
         Mockito.when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(null, "Student"));
         Assertions.assertThrows(RuntimeException.class, () -> userService.findUserById("Student"));
         // verify target method exceptionService.increaseCount was triggered. not a good way

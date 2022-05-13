@@ -48,7 +48,7 @@ public class UserServiceTestV2 {
     }
 
     @Test
-    public void giveStudentUserIdThenReturnUserWithStudentExtendInfo() {
+    public void testFindUserById_when_userIsStudent_then_returnUserWithStudentExtendInfo() {
         when(userAdapter.getStudentExtendInfo(anyString())).thenReturn(User.StudentExtraInfo.builder().grade("Mockito-Grade-3").build());
         when(userAdapter.getTeacherExtendInfo(anyString())).thenReturn(User.TeacherExtraInfo.builder().subject("Mockito-Subject-Chinese").build());
 
@@ -66,7 +66,7 @@ public class UserServiceTestV2 {
     }
 
     @Test
-    public void giveTeacherUserIdThenReturnUserWithTeacherExtendInfo() {
+    public void testFindUserById_when_userIsTeacher_then_returnUserWithTeacherExtendInfo() {
         when(userDao.findUserById("Teacher")).thenReturn(buildUserBaseInfo(Type.TEACHER, "Teacher"));
         User teacher = userService.findUserById("Teacher");
         Assert.assertNotNull(teacher.getTeacherExtraInfo());
@@ -74,7 +74,7 @@ public class UserServiceTestV2 {
     }
 
     @Test
-    public void giveInvalidDataThenThrowException() {
+    public void testFindUserById_when_userIsInvalidData_then_throwException() {
         when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(null, "Student"));
         Assertions.assertThrows(RuntimeException.class, () -> userService.findUserById("Student"));
         // verify target method exceptionService.increaseCount was triggered
