@@ -6,65 +6,68 @@ import com.leon.demo.junit.model.Type;
 import com.leon.demo.junit.model.User;
 import com.leon.demo.junit.service.impl.UserServiceImpl;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static org.mockito.Mockito.*;
+
 /**
  * @Author : LeonWang
- * @Descpriction This is a common spring unit tester
- * Junit 4
- * @Date:created 2022/5/4
+ * @Descpriction This is a common mockito unit tester
+ * Junit 5
+ * @Date:created 2022/5/9
  */
-@SpringBootTest(classes = {UserServiceImpl.class, UserDao.class, UserAdapter.class, ExceptionService.class})
-@RunWith(SpringRunner.class)
-@ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class UserServiceTestV2 {
+    @InjectMocks
+    private UserServiceImpl userService;
 
-    @Autowired
-    private UserService userService;
-
-    @MockBean
+    @Mock
     private UserDao userDao;
 
-    @MockBean
+    @Mock
     private UserAdapter userAdapter;
 
-    @Autowired
+    @Mock
     private ExceptionService exceptionService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         // you can set up a common mock for all test method.
-        Mockito.when(userAdapter.getStudentExtendInfo(Mockito.anyString())).thenReturn(User.StudentExtraInfo.builder().grade("Mockito-Grade-3").build());
-        Mockito.when(userAdapter.getTeacherExtendInfo(Mockito.anyString())).thenReturn(User.TeacherExtraInfo.builder().subject("Mockito-Subject-Chinese").build());
+        when(userAdapter.getStudentExtendInfo(anyString())).thenReturn(User.StudentExtraInfo.builder().grade("Mockito-Grade-3").build());
+        when(userAdapter.getTeacherExtendInfo(anyString())).thenReturn(User.TeacherExtraInfo.builder().subject("Mockito-Subject-Chinese").build());
     }
 
     @Test
     public void giveStudentUserIdThenReturnUserWithStudentExtendInfo() {
+        when(userAdapter.getStudentExtendInfo(anyString())).thenReturn(User.StudentExtraInfo.builder().grade("Mockito-Grade-3").build());
+        when(userAdapter.getTeacherExtendInfo(anyString())).thenReturn(User.TeacherExtraInfo.builder().subject("Mockito-Subject-Chinese").build());
+
+        //given
+        String userId = "Student";
         // you can set up a specific mock for all test method.
-        Mockito.when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(Type.STUDENT, "Student"));
+        when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(Type.STUDENT, "Student"));
+
+        // when
         User student = userService.findUserById("Student");
+
+        // then
         Assert.assertNotNull(student.getStudentExtraInfo());
         Assert.assertNull(student.getTeacherExtraInfo());
     }
 
     @Test
     public void giveTeacherUserIdThenReturnUserWithTeacherExtendInfo() {
-        Mockito.when(userDao.findUserById("Teacher")).thenReturn(buildUserBaseInfo(Type.TEACHER, "Teacher"));
+        when(userDao.findUserById("Teacher")).thenReturn(buildUserBaseInfo(Type.TEACHER, "Teacher"));
         User teacher = userService.findUserById("Teacher");
         Assert.assertNotNull(teacher.getTeacherExtraInfo());
         Assert.assertNull(teacher.getStudentExtraInfo());
@@ -72,10 +75,10 @@ public class UserServiceTest {
 
     @Test
     public void giveInvalidDataThenThrowException() {
-        Mockito.when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(null, "Student"));
+        when(userDao.findUserById("Student")).thenReturn(buildUserBaseInfo(null, "Student"));
         Assertions.assertThrows(RuntimeException.class, () -> userService.findUserById("Student"));
-        // verify target method exceptionService.increaseCount was triggered. not a good way
-        Assert.assertEquals(1, exceptionService.getErrorMessageCount());
+        // verify target method exceptionService.increaseCount was triggered
+        verify(exceptionService).increaseCount();
     }
 
 
@@ -94,5 +97,4 @@ public class UserServiceTest {
                 .birthday(birthday)
                 .build();
     }
-
 }

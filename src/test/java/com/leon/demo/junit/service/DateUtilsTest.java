@@ -16,6 +16,7 @@ import java.util.Collection;
 /**
  * @Author : LeonWang
  * @Descpriction  when the test case for one method is too many , we can run test with Parameterized runner
+ * JUnit 4
  * @Date:created 2022/5/5
  */
 @Getter
